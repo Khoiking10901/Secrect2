@@ -2,76 +2,86 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>8/3 - Vườn Hồng Tặng Bạn</title>
     <style>
-        :root { --pink: #ff80ab; --dark: #c2185b; --glass: rgba(255, 255, 255, 0.8); }
-
-        /* --- UI ADAPTIVE --- */
-        @media screen and (max-height: 500px) {
-            .toolbar { width: 60px !important; gap: 8px !important; }
-            .tool { font-size: 30px !important; }
-            .status-bubble { padding: 8px !important; font-size: 12px !important; max-width: 350px !important; }
-            .pot-container { transform: scale(0.65) translateY(30px); }
+        :root { --pink: #ff80ab; --dark: #c2185b; --glass: rgba(255, 255, 255, 0.7); }
+        
+        /* HIỆU ỨNG XOAY MÀN HÌNH */
+        #orientation-overlay {
+            position: fixed; inset: 0; background: #c2185b; z-index: 9999;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; padding: 20px;
+        }
+        .phone-icon {
+            width: 50px; height: 100px; border: 3px solid white; border-radius: 10px;
+            margin-bottom: 20px; animation: rotatePhone 2s infinite ease-in-out;
+            position: relative;
+        }
+        .phone-icon::after {
+            content: ''; position: absolute; width: 10px; height: 10px; 
+            background: white; border-radius: 50%; bottom: 5px; left: 20px;
+        }
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+        /* Chỉ hiện overlay khi màn hình ở chế độ dọc (Portrait) */
+        @media (orientation: portrait) {
+            #orientation-overlay { display: flex; }
         }
 
         body { 
-            margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; background: linear-gradient(180deg, #a1c4fd, #fbc2eb); 
-            display: flex; transition: filter 0.5s ease;
+            margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; 
+            background: linear-gradient(180deg, #a1c4fd, #fbc2eb); display: flex; 
+            transition: filter 0.5s ease;
         }
-
-        /* Overlay nhắc xoay */
-        #orientation-overlay {
-            position: fixed; inset: 0; background: var(--dark); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; text-align: center; padding: 20px;
-        }
-        @media (orientation: landscape) { #orientation-overlay { display: none; } }
-
-        /* Toolbars */
-        .toolbar { display: flex; flex-direction: column; justify-content: center; width: 85px; gap: 20px; background: var(--glass); backdrop-filter: blur(10px); z-index: 1000; border: 1px solid white; }
+        .toolbar { width: 85px; display: flex; flex-direction: column; justify-content: center; gap: 20px; background: var(--glass); backdrop-filter: blur(10px); z-index: 1000; border: 1px solid white; }
         .left-bar { border-radius: 0 30px 30px 0; }
         .right-bar { border-radius: 30px 0 0 30px; }
-        
-        .tool { cursor: pointer; transition: 0.3s; text-align: center; filter: grayscale(0.6); padding: 10px 0; }
-        .tool.selected { filter: grayscale(0); background: white; border-radius: 15px; box-shadow: 0 0 20px var(--pink); transform: scale(1.15); }
-
-        .main-game { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px; }
-
-        /* Thành tựu Menu */
-        #btn-menu { position: fixed; top: 15px; left: 15px; font-size: 25px; background: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; z-index: 2500; cursor: pointer; border: 2px solid gold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #achieve-menu { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .menu-content { background: white; width: 85%; max-width: 400px; border-radius: 25px; padding: 20px; position: relative; }
-        .achieve-grid { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 300px; overflow-y: auto; }
-        .ach-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: #f5f5f5; opacity: 0.4; filter: grayscale(1); transition: 0.5s; }
-        .ach-item.unlocked { opacity: 1; filter: grayscale(0); background: #fffde7; border: 1px solid gold; }
-
-        .pot-container { position: relative; width: 100%; max-width: 300px; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; }
-        .pot { width: 120px; height: 80px; background: white; border: 5px solid #f8bbd0; border-radius: 0 0 50px 50px; z-index: 10; position: relative; }
-        #rose-svg { position: absolute; bottom: 75px; width: 180px; height: 180px; z-index: 5; pointer-events: none; }
-        #envelope { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 5000; cursor: pointer; animation: bounce 2s infinite; }
-        
-        @keyframes bounce { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -60%) scale(1.1); } }
+        .tool { font-size: 45px; cursor: pointer; transition: 0.3s; text-align: center; padding: 10px 0; filter: grayscale(0.6); }
+        .tool.selected { filter: grayscale(0); background: white; border-radius: 20px; box-shadow: 0 0 20px var(--pink); transform: scale(1.1); }
+        .main-game { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .status-bubble { background: white; padding: 15px; border-radius: 25px; border: 3px solid var(--pink); font-weight: bold; color: var(--dark); text-align: center; width: 90%; max-width: 500px; z-index: 100; }
+        #timer-display { margin-top: 10px; font-weight: bold; color: #555; background: rgba(255,255,255,0.6); padding: 5px 20px; border-radius: 20px; }
+        .pot-container { position: relative; width: 300px; height: 350px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; margin-top: 30px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .pot { width: 140px; height: 100px; background: white; border: 6px solid #f8bbd0; border-radius: 0 0 60px 60px; z-index: 10; position: relative; }
+        #rose-svg { position: absolute; bottom: 95px; width: 220px; height: 220px; z-index: 5; pointer-events: none; }
+        #btn-menu { position: fixed; top: 20px; left: 20px; font-size: 30px; background: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; z-index: 2500; cursor: pointer; border: 3px solid gold; }
+        #achieve-menu { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .menu-content { background: white; width: 90%; max-width: 450px; border-radius: 30px; padding: 25px; position: relative; }
+        .achieve-grid { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 400px; overflow-y: auto; }
+        .achieve-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 15px; background: #eee; opacity: 0.3; filter: grayscale(1); }
+        .achieve-item.unlocked { opacity: 1; filter: grayscale(0); background: #fffde7; border: 1px solid gold; }
+        #achievement-toast { position: fixed; top: 30px; right: -400px; background: #fff59d; color: #333; padding: 15px 25px; border-radius: 30px 0 0 30px; font-weight: bold; transition: 0.7s; z-index: 6000; border: 3px solid gold; }
+        #achievement-toast.show { right: 0; }
+        #envelope { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 130px; z-index: 5000; cursor: pointer; animation: bounce 2s infinite; }
     </style>
 </head>
-<body onclick="tryFullscreen()">
+<body>
 
 <div id="orientation-overlay">
-    <div style="font-size: 50px; margin-bottom: 20px;">📱🔄</div>
-    <h2>Xoay ngang màn hình</h2>
-    <p>Chạm vào nút để vào game!</p>
-    <button onclick="tryFullscreen()" style="padding: 12px 25px; border-radius: 20px; border: none; background: white; color: var(--dark); font-weight: bold;">BẮT ĐẦU</button>
+    <div class="phone-icon"></div>
+    <h2>Xoay ngang màn hình đi bạn êi!</h2>
+    <p>Để trải nghiệm vườn hồng xịn xò nhất nhé ❤️</p>
 </div>
 
-<div id="btn-menu" onclick="openMenu(event)">🏆</div>
+<audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+<audio id="sfxError"><source src="objective.mp3" type="audio/mpeg"></audio>
+<audio id="sfxAchieve"><source src="achieve.mp3" type="audio/mpeg"></audio>
+
+<div id="btn-menu" onclick="openMenu()">🏆</div>
 <div id="achieve-menu">
     <div class="menu-content">
-        <div style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;" onclick="toggleMenu(false)">✖</div>
-        <h3 style="text-align:center; color:var(--dark); margin-top:0;">Huy Chương Bạn Thân</h3>
+        <div style="position:absolute; top:15px; right:20px; font-size:25px; cursor:pointer;" onclick="toggleMenu(false)">✖</div>
+        <h3 style="text-align:center; color:var(--dark); margin:0 0 15px 0;">Huy Chương Tình Bạn ✨</h3>
         <div class="achieve-grid" id="achieveGrid"></div>
+        <div onclick="clearData()" style="text-align:center; margin-top:15px; font-size:11px; color:#bbb; cursor:pointer;">Xóa lịch sử phá đảo</div>
     </div>
 </div>
+
+<div id="achievement-toast">🔓 <b>Kèo này thơm:</b><br><span id="ach-name"></span></div>
 
 <div class="toolbar left-bar">
     <div class="tool" onclick="st('seed', this)">🌱</div>
@@ -80,21 +90,20 @@
 </div>
 
 <div class="main-game">
-    <div class="status-bubble" id="bubble">Chọn đồ rồi chạm vào chậu để bắt đầu nha!</div>
-    <div id="timer-display" style="font-size: 14px; font-weight: bold; color: #555;">⏱️ 0s</div>
-
+    <div class="status-bubble" id="bubble">Chọn đồ đi rồi chạm vào chậu để bắt đầu nha bạn tui!</div>
+    <div id="timer-display">⏱️ Tốc độ: 0s</div>
+    <div style="width:85%; height:10px; background:#eee; border-radius:5px; margin:15px 0; overflow:hidden;">
+        <div id="pBar" style="width:0%; height:100%; background:var(--pink); transition:0.3s;"></div>
+    </div>
+    
     <div class="pot-container" id="potBox" onclick="act()">
         <svg id="rose-svg" viewBox="0 0 100 100">
             <path id="stem" d="M50,95 Q50,70 50,40" style="stroke:#2e7d32; stroke-width:4; fill:none; stroke-dasharray:100; stroke-dashoffset:100; transition:2s;" />
-            <circle class="petal" cx="50" cy="40" r="10" style="fill:#ff1744; opacity:0; transition:1s;" />
-            <circle class="petal" cx="42" cy="35" r="8" style="fill:#ff1744; opacity:0; transition:1s;" />
-            <circle class="petal" cx="58" cy="35" r="8" style="fill:#ff1744; opacity:0; transition:1s;" />
+            <circle class="petal" cx="50" cy="40" r="12" style="fill:#ff1744; opacity:0; transition:1s;" />
+            <circle class="petal" cx="42" cy="35" r="10" style="fill:#ff1744; opacity:0; transition:1s;" />
+            <circle class="petal" cx="58" cy="35" r="10" style="fill:#ff1744; opacity:0; transition:1s;" />
         </svg>
         <div class="pot"></div>
-    </div>
-
-    <div style="width: 80%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden;">
-        <div id="pBar" style="width: 0%; height: 100%; background: var(--pink); transition: 0.3s;"></div>
     </div>
 </div>
 
@@ -108,55 +117,55 @@
 
 <script>
     const achs = [
-        {id:1, n:"Tay Đua", d:"Dưới 45s.", icon:"👑"},
-        {id:2, n:"Pig or Big?", d:"Bón phân lầy lội.", icon:"🐖"},
-        {id:3, n:"Hào Quang", d:"Hoa nở rực rỡ.", icon:"🌹"}
+        {id:1, n:"Tay Đua Cấp 1", d:"Về đích dưới 2p10s.", icon:"🏃"},
+        {id:2, n:"Tay Đua Cấp 2", d:"Về đích dưới 1p30s.", icon:"⚡"},
+        {id:3, n:"Thánh Tốc Độ", d:"Phá đảo dưới 45s.", icon:"👑"},
+        {id:14, n:"Kỹ Sư Nông Nghiệp", d:"Chăm cây không sai bước nào.", icon:"🎓"},
+        {id:4, n:"Thánh Nghịch Nước", d:"Tưới nước sai 3 lần.", icon:"⛈️"},
+        {id:5, n:"Hạn Hán Lời", d:"Dùng nắng sai 3 lần.", icon:"🏜️"},
+        {id:12, n:"Yêu ?!", d:"Trao tim sai chỗ 5 lần.", icon:"💔"},
+        {id:13, n:"Người Tận Tâm", d:"Bấm chậu hơn 50 lần.", icon:"💪"},
+        {id:17, n:"Pig or Big?", d:"Bón phân lầy lội khiến cây chiếm thế giới.", icon:"🐖"},
+        {id:18, n:"Lấp Lánh Quá !!!", d:"Mù mắt vì sparkle sai chỗ.", icon:"👓"},
+        {id:15, n:"Fan Cứng", d:"Soi bảng thành tựu 3 lần.", icon:"⭐"},
+        {id:9, n:"Hào Quang Rực Rỡ", d:"Trồng thành công bông hoa hồng.", icon:"🌹"},
+        {id:10, n:"Trùm Cuối", d:"Mở khóa toàn bộ thử thách!", icon:"💎"}
     ];
+
     let lv=1, step=0, target=[], selId=null, startTime=null, timerInterval=null;
-    let stats = { fertFail:0, sprayFail:0 };
+    let stats = { wFail:0, sFail:0, heartFail:0, fertFail:0, sprayFail:0, clickCount:0, menuViews:0, totalErrors:0 };
     let unlocked = new Set();
+    let toastQueue = [];
+    let isShowingToast = false;
     const toolIcons = { seed:"🌱", water:"💧", sun:"☀️", fert:"💩", spray:"✨", heart:"💖" };
 
-    function tryFullscreen() {
-        const el = document.documentElement;
-        if (el.requestFullscreen) el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    }
-
-    function st(id, el) {
-        selId = id;
-        document.querySelectorAll('.tool').forEach(t => t.classList.remove('selected'));
+    function st(id, el) { 
+        selId = id; 
+        document.querySelectorAll('.tool').forEach(t=>t.classList.remove('selected'));
         el.classList.add('selected');
+        document.getElementById('bgMusic').play().catch(()=>{});
     }
 
-    function renderAchs() {
-        document.getElementById('achieveGrid').innerHTML = achs.map(a => `
-            <div class="ach-item ${unlocked.has(a.id)?'unlocked':''}">
-                <div style="font-size:25px;">${a.icon}</div>
-                <div><b style="font-size:12px;">${a.n}</b><br><span style="font-size:10px;">${a.d}</span></div>
-            </div>
-        `).join('');
-    }
-
-    function unlock(id) {
-        if(unlocked.has(id)) return;
-        unlocked.add(id); renderAchs();
-    }
-
-    function openMenu(e) { e.stopPropagation(); toggleMenu(true); }
-    function toggleMenu(s) { document.getElementById('achieve-menu').style.display = s?'flex':'none'; }
-
-    function init() {
-        step = 0; document.getElementById('pBar').style.width = '0%';
-        target = (lv===1) ? Array(5).fill("seed") : ["water","sun","fert","spray","heart"].sort(()=>Math.random()-0.5);
-        document.getElementById('bubble').innerHTML = `GĐ ${lv}/4 - Cần cái này: ${toolIcons[target[step]]}`;
+    function downloadLetter() {
+        const link = document.createElement('a');
+        link.href = 'letter.docx'; 
+        link.download = 'letter.docx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert('Chúc mừng 8/3 nha! Quà đã tải về máy, kiểm tra trong Downloads nhé bạn tui ❤️');
     }
 
     function act() {
+        stats.clickCount++; if(stats.clickCount >= 50) unlock(13);
         if(!selId) return;
-        if(!startTime) { startTime = Date.now(); timerInterval = setInterval(()=> {
-            document.getElementById('timer-display').innerText = `⏱️ ${Math.floor((Date.now()-startTime)/1000)}s`;
-        }, 1000); init(); }
+        if(!startTime) { 
+            startTime = Date.now(); 
+            timerInterval = setInterval(()=> {
+                document.getElementById('timer-display').innerText = `⏱️ Tốc độ: ${Math.floor((Date.now()-startTime)/1000)}s`;
+            }, 1000); 
+            init(); 
+        }
 
         if(selId === target[step]) {
             document.getElementById('potBox').style.transform = "scale(1)";
@@ -165,34 +174,83 @@
             document.getElementById('pBar').style.width = (step/target.length)*100+'%';
             if(step >= target.length) {
                 if(lv===1) document.getElementById('stem').style.strokeDashoffset="0";
-                if(lv===4) { 
-                    document.querySelectorAll('.petal').forEach(p => p.style.opacity="1");
-                    clearInterval(timerInterval);
-                    if((Date.now()-startTime)/1000 < 45) unlock(1);
-                    unlock(3);
-                    document.getElementById('bubble').innerHTML = "Quà tặng ở lá thư kìa bạn tui ❤️";
-                    document.getElementById('envelope').style.display = 'block';
-                } else { lv++; setTimeout(init, 800); }
-            } else { document.getElementById('bubble').innerHTML = `Tiếp tục: ${toolIcons[target[step]]}`; }
+                if(lv===4) { document.querySelectorAll('.petal').forEach(p=>p.style.opacity="1"); checkEndGame(); }
+                else { lv++; setTimeout(init, 800); }
+            } else { document.getElementById('bubble').innerHTML = `Làm tiếp đi bạn: ${toolIcons[target[step]]}`; }
         } else {
-            if(selId==='fert') {
-                stats.fertFail++;
-                document.getElementById('potBox').style.transform = `scale(${1 + stats.fertFail*0.2})`;
-                step = 0; document.getElementById('pBar').style.width = '0%';
-                if(stats.fertFail>=3) unlock(2);
+            document.getElementById('sfxError').play().catch(()=>{});
+            stats.totalErrors++;
+            if(selId==='fert') { 
+                stats.fertFail++; 
+                document.getElementById('potBox').style.transform = `scale(${1 + stats.fertFail*0.25})`;
+                step = 0; 
+                document.getElementById('pBar').style.width = '0%';
+                document.getElementById('bubble').innerHTML = `To quá rồii! Làm lại level này đi: ${toolIcons[target[step]]}`;
+                if(stats.fertFail===5) { unlock(17); alert("CÂY KHỔNG LỒ XÂM CHIẾM THẾ GIỚI RỒI BẠN ƠI!!!"); window.open("https://www.google.com", "_blank"); }
             }
             if(selId==='spray') {
-                document.body.style.filter = `brightness(${1 + (++stats.sprayFail)*0.6})`;
+                stats.sprayFail++;
+                document.body.style.filter = `brightness(${1 + stats.sprayFail*0.65})`;
+                if(stats.sprayFail===5) { unlock(18); alert("CHÓI QUÁ! ĐI KHÁM MẮT THÔI BẠN TUI!"); window.location.href = "https://benhvienmat.vn/"; }
             }
+            if(selId==='water') { stats.wFail++; if(stats.wFail===3) unlock(4); }
+            if(selId==='sun') { stats.sFail++; if(stats.sFail===3) unlock(5); }
+            if(selId==='heart') { stats.heartFail++; if(stats.heartFail===5) unlock(12); }
         }
     }
 
-    function downloadLetter() {
-        const link = document.createElement('a');
-        link.href = 'letter.docx'; link.download = 'letter.docx';
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    function unlock(id) {
+        if(unlocked.has(id)) return;
+        unlocked.add(id);
+        const a = achs.find(x=>x.id===id);
+        if(a) { toastQueue.push(a); showNextToast(); }
+        renderAchs();
+        if(id !== 10 && unlocked.size === 12) setTimeout(() => unlock(10), 500);
+        localStorage.setItem('garden_friend_v1', JSON.stringify([...unlocked]));
     }
 
+    function renderAchs() {
+        document.getElementById('achieveGrid').innerHTML = achs.map(a => `
+            <div class="achieve-item ${unlocked.has(a.id)?'unlocked':''}" id="ac-${a.id}">
+                <div style="font-size:30px;">${a.icon}</div>
+                <div style="flex:1"><b style="font-size:13px;">${a.n}</b><br><span style="font-size:10px;">${a.d}</span></div>
+            </div>
+        `).join('');
+    }
+
+    function showNextToast() {
+        if (isShowingToast || toastQueue.length === 0) return;
+        isShowingToast = true;
+        const a = toastQueue.shift();
+        const toast = document.getElementById('achievement-toast');
+        document.getElementById('sfxAchieve').play().catch(()=>{});
+        document.getElementById('ach-name').innerText = a.n;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { isShowingToast = false; showNextToast(); }, 700); }, 3000);
+    }
+
+    function init() {
+        step = 0; document.getElementById('pBar').style.width = '0%';
+        target = (lv===1) ? Array(7).fill("seed") : ["water","sun","fert","spray","heart"].sort(()=>Math.random()-0.5);
+        document.getElementById('bubble').innerHTML = `GĐ ${lv}/4 - Mau lấy cái này: ${toolIcons[target[step]]}`;
+    }
+
+    function checkEndGame() {
+        clearInterval(timerInterval);
+        let time = (Date.now() - startTime) / 1000;
+        if(time <= 130) unlock(1); if(time <= 90) unlock(2); if(time <= 45) unlock(3);
+        if(stats.totalErrors === 0) unlock(14);
+        unlock(9);
+        document.getElementById('bubble').innerHTML = "Ghê đấy! Chúc mừng 8/3 nha bạn tui! Nhận quà bên dưới kìa 👇";
+        document.getElementById('envelope').style.display = 'block';
+    }
+
+    function openMenu() { stats.menuViews++; if(stats.menuViews === 3) unlock(15); toggleMenu(true); }
+    function toggleMenu(s) { document.getElementById('achieve-menu').style.display = s?'flex':'none'; }
+    function clearData() { if(confirm("Xóa hết thành tích cũ nha?")) { localStorage.clear(); location.reload(); } }
+
+    const saved = localStorage.getItem('garden_friend_v1');
+    if (saved) { JSON.parse(saved).forEach(id => unlocked.add(id)); }
     renderAchs();
 </script>
 </body>
