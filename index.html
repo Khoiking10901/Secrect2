@@ -7,29 +7,21 @@
     <style>
         :root { --pink: #ff80ab; --dark: #c2185b; --glass: rgba(255, 255, 255, 0.8); }
 
-        /* --- UI CHUYÊN BIỆT CHO DI ĐỘNG (XOAY NGANG) --- */
+        /* --- UI ADAPTIVE --- */
         @media screen and (max-height: 500px) {
-            .toolbar { width: 60px !important; gap: 10px !important; }
-            .tool { font-size: 30px !important; padding: 5px 0 !important; }
-            .status-bubble { padding: 8px !important; font-size: 13px !important; max-width: 400px !important; }
-            .pot-container { transform: scale(0.7) translateY(20px); }
-            #timer-display { font-size: 12px; padding: 3px 15px; }
+            .toolbar { width: 60px !important; gap: 8px !important; }
+            .tool { font-size: 30px !important; }
+            .status-bubble { padding: 8px !important; font-size: 12px !important; max-width: 350px !important; }
+            .pot-container { transform: scale(0.65) translateY(30px); }
         }
 
-        /* --- UI CHO MÁY TÍNH / MÀN HÌNH LỚN --- */
-        @media screen and (min-height: 501px) {
-            .toolbar { width: 85px; gap: 20px; }
-            .tool { font-size: 45px; padding: 10px 0; }
-        }
-
-        /* --- PHẦN NỀN & BỐ CỤC CHUNG --- */
         body { 
-            margin: 0; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; 
             overflow: hidden; background: linear-gradient(180deg, #a1c4fd, #fbc2eb); 
             display: flex; transition: filter 0.5s ease;
         }
 
-        /* Overlay nhắc xoay & Fullscreen */
+        /* Overlay nhắc xoay */
         #orientation-overlay {
             position: fixed; inset: 0; background: var(--dark); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -37,23 +29,27 @@
         }
         @media (orientation: landscape) { #orientation-overlay { display: none; } }
 
-        .toolbar { display: flex; flex-direction: column; justify-content: center; background: var(--glass); backdrop-filter: blur(10px); z-index: 1000; border: 1px solid white; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        /* Toolbars */
+        .toolbar { display: flex; flex-direction: column; justify-content: center; width: 85px; gap: 20px; background: var(--glass); backdrop-filter: blur(10px); z-index: 1000; border: 1px solid white; }
         .left-bar { border-radius: 0 30px 30px 0; }
         .right-bar { border-radius: 30px 0 0 30px; }
         
-        .tool { cursor: pointer; transition: 0.3s; text-align: center; filter: grayscale(0.6); }
+        .tool { cursor: pointer; transition: 0.3s; text-align: center; filter: grayscale(0.6); padding: 10px 0; }
         .tool.selected { filter: grayscale(0); background: white; border-radius: 15px; box-shadow: 0 0 20px var(--pink); transform: scale(1.15); }
 
         .main-game { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px; }
 
-        .pot-container { 
-            position: relative; width: 100%; max-width: 300px; height: 300px; 
-            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
-            cursor: pointer; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
-        .pot { width: 120px; height: 80px; background: white; border: 5px solid #f8bbd0; border-radius: 0 0 50px 50px; z-index: 10; }
-        #rose-svg { position: absolute; bottom: 75px; width: 180px; height: 180px; z-index: 5; pointer-events: none; }
+        /* Thành tựu Menu */
+        #btn-menu { position: fixed; top: 15px; left: 15px; font-size: 25px; background: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; z-index: 2500; cursor: pointer; border: 2px solid gold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #achieve-menu { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .menu-content { background: white; width: 85%; max-width: 400px; border-radius: 25px; padding: 20px; position: relative; }
+        .achieve-grid { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .ach-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: #f5f5f5; opacity: 0.4; filter: grayscale(1); transition: 0.5s; }
+        .ach-item.unlocked { opacity: 1; filter: grayscale(0); background: #fffde7; border: 1px solid gold; }
 
+        .pot-container { position: relative; width: 100%; max-width: 300px; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; }
+        .pot { width: 120px; height: 80px; background: white; border: 5px solid #f8bbd0; border-radius: 0 0 50px 50px; z-index: 10; position: relative; }
+        #rose-svg { position: absolute; bottom: 75px; width: 180px; height: 180px; z-index: 5; pointer-events: none; }
         #envelope { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 5000; cursor: pointer; animation: bounce 2s infinite; }
         
         @keyframes bounce { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -60%) scale(1.1); } }
@@ -64,8 +60,17 @@
 <div id="orientation-overlay">
     <div style="font-size: 50px; margin-bottom: 20px;">📱🔄</div>
     <h2>Xoay ngang màn hình</h2>
-    <p>Sau đó chạm vào nút dưới đây để bắt đầu!</p>
-    <button onclick="tryFullscreen()" style="padding: 15px 30px; border-radius: 25px; border: none; background: white; color: var(--dark); font-weight: bold; cursor: pointer;">VÀO GAME</button>
+    <p>Chạm vào nút để vào game!</p>
+    <button onclick="tryFullscreen()" style="padding: 12px 25px; border-radius: 20px; border: none; background: white; color: var(--dark); font-weight: bold;">BẮT ĐẦU</button>
+</div>
+
+<div id="btn-menu" onclick="openMenu(event)">🏆</div>
+<div id="achieve-menu">
+    <div class="menu-content">
+        <div style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;" onclick="toggleMenu(false)">✖</div>
+        <h3 style="text-align:center; color:var(--dark); margin-top:0;">Huy Chương Bạn Thân</h3>
+        <div class="achieve-grid" id="achieveGrid"></div>
+    </div>
 </div>
 
 <div class="toolbar left-bar">
@@ -75,11 +80,8 @@
 </div>
 
 <div class="main-game">
-    <div class="status-bubble" id="bubble" style="background: white; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--pink); font-weight: bold; color: var(--dark);">
-        Bạn sẵn sàng chưa? Chọn đồ rồi chạm vào chậu nhé!
-    </div>
-    
-    <div id="timer-display" style="background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 15px; font-size: 14px;">⏱️ 0s</div>
+    <div class="status-bubble" id="bubble">Chọn đồ rồi chạm vào chậu để bắt đầu nha!</div>
+    <div id="timer-display" style="font-size: 14px; font-weight: bold; color: #555;">⏱️ 0s</div>
 
     <div class="pot-container" id="potBox" onclick="act()">
         <svg id="rose-svg" viewBox="0 0 100 100">
@@ -91,7 +93,7 @@
         <div class="pot"></div>
     </div>
 
-    <div style="width: 80%; height: 8px; background: #ddd; border-radius: 4px; overflow: hidden;">
+    <div style="width: 80%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden;">
         <div id="pBar" style="width: 0%; height: 100%; background: var(--pink); transition: 0.3s;"></div>
     </div>
 </div>
@@ -105,8 +107,14 @@
 <div id="envelope" onclick="downloadLetter()">💌</div>
 
 <script>
+    const achs = [
+        {id:1, n:"Tay Đua", d:"Dưới 45s.", icon:"👑"},
+        {id:2, n:"Pig or Big?", d:"Bón phân lầy lội.", icon:"🐖"},
+        {id:3, n:"Hào Quang", d:"Hoa nở rực rỡ.", icon:"🌹"}
+    ];
     let lv=1, step=0, target=[], selId=null, startTime=null, timerInterval=null;
     let stats = { fertFail:0, sprayFail:0 };
+    let unlocked = new Set();
     const toolIcons = { seed:"🌱", water:"💧", sun:"☀️", fert:"💩", spray:"✨", heart:"💖" };
 
     function tryFullscreen() {
@@ -121,6 +129,23 @@
         el.classList.add('selected');
     }
 
+    function renderAchs() {
+        document.getElementById('achieveGrid').innerHTML = achs.map(a => `
+            <div class="ach-item ${unlocked.has(a.id)?'unlocked':''}">
+                <div style="font-size:25px;">${a.icon}</div>
+                <div><b style="font-size:12px;">${a.n}</b><br><span style="font-size:10px;">${a.d}</span></div>
+            </div>
+        `).join('');
+    }
+
+    function unlock(id) {
+        if(unlocked.has(id)) return;
+        unlocked.add(id); renderAchs();
+    }
+
+    function openMenu(e) { e.stopPropagation(); toggleMenu(true); }
+    function toggleMenu(s) { document.getElementById('achieve-menu').style.display = s?'flex':'none'; }
+
     function init() {
         step = 0; document.getElementById('pBar').style.width = '0%';
         target = (lv===1) ? Array(5).fill("seed") : ["water","sun","fert","spray","heart"].sort(()=>Math.random()-0.5);
@@ -134,10 +159,8 @@
         }, 1000); init(); }
 
         if(selId === target[step]) {
-            // Sửa lỗi: Cây co lại và ánh sáng bình thường khi chọn đúng
             document.getElementById('potBox').style.transform = "scale(1)";
             document.body.style.filter = "brightness(1)";
-            
             step++;
             document.getElementById('pBar').style.width = (step/target.length)*100+'%';
             if(step >= target.length) {
@@ -145,21 +168,21 @@
                 if(lv===4) { 
                     document.querySelectorAll('.petal').forEach(p => p.style.opacity="1");
                     clearInterval(timerInterval);
-                    document.getElementById('bubble').innerHTML = "Xong rồi! Quà ở lá thư kìa ❤️";
+                    if((Date.now()-startTime)/1000 < 45) unlock(1);
+                    unlock(3);
+                    document.getElementById('bubble').innerHTML = "Quà tặng ở lá thư kìa bạn tui ❤️";
                     document.getElementById('envelope').style.display = 'block';
                 } else { lv++; setTimeout(init, 800); }
-            } else { document.getElementById('bubble').innerHTML = `Tiếp tục nào: ${toolIcons[target[step]]}`; }
+            } else { document.getElementById('bubble').innerHTML = `Tiếp tục: ${toolIcons[target[step]]}`; }
         } else {
             if(selId==='fert') {
                 stats.fertFail++;
                 document.getElementById('potBox').style.transform = `scale(${1 + stats.fertFail*0.2})`;
                 step = 0; document.getElementById('pBar').style.width = '0%';
-                if(stats.fertFail===5) { alert("Cây chiếm thế giới rồi!"); window.open("https://google.com"); }
+                if(stats.fertFail>=3) unlock(2);
             }
             if(selId==='spray') {
-                stats.sprayFail++;
-                document.body.style.filter = `brightness(${1 + stats.sprayFail*0.6})`;
-                if(stats.sprayFail===5) { alert("Đi khám mắt thôi bạn ơi!"); window.location.href="https://benhvienmat.vn/"; }
+                document.body.style.filter = `brightness(${1 + (++stats.sprayFail)*0.6})`;
             }
         }
     }
@@ -168,8 +191,9 @@
         const link = document.createElement('a');
         link.href = 'letter.docx'; link.download = 'letter.docx';
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        alert('Đã tải thư thành công! Kiểm tra máy nhé!');
     }
+
+    renderAchs();
 </script>
 </body>
 </html>
